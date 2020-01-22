@@ -1,4 +1,4 @@
-# invents
+# Taurus
 event sourcing based identity governance solution.
 
 ## Setup

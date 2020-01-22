@@ -1,4 +1,4 @@
-package org.linesofcode.invents
+package org.linesofcode.taurus
 
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody

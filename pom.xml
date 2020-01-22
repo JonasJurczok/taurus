@@ -11,10 +11,10 @@
 	</parent>
 
 	<groupId>org.linesofcode</groupId>
-	<artifactId>invents</artifactId>
+	<artifactId>taurus</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
-	<name>invents</name>
+	<name>Taurus</name>
 	<description>Event sourcing based identity governance solution.</description>
 
 	<properties>

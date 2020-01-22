@@ -1,4 +1,4 @@
-package org.linesofcode.invents
+package org.linesofcode.taurus
 
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Component

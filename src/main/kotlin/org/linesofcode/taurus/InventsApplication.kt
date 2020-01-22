@@ -1,4 +1,4 @@
-package org.linesofcode.invents
+package org.linesofcode.taurus
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
