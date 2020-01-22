@@ -1,15 +1,12 @@
-package org.linesofcode.taurus
+package org.linesofcode.taurus.infrastructure
 
 import org.apache.kafka.common.TopicPartition
-import org.slf4j.LoggerFactory
-import org.springframework.kafka.annotation.KafkaListener
+import org.slf4j.Logger
 import org.springframework.kafka.listener.AbstractConsumerSeekAware
 import org.springframework.kafka.listener.ConsumerSeekAware
-import org.springframework.stereotype.Component
 
-@Component
-class KotlinConsumer: AbstractConsumerSeekAware() {
-    private val logger = LoggerFactory.getLogger(javaClass)
+abstract class AbstractReadFromBeginningListener: AbstractConsumerSeekAware() {
+    protected abstract val logger: Logger
 
     override fun onPartitionsAssigned(assignments: MutableMap<TopicPartition, Long>?, callback: ConsumerSeekAware.ConsumerSeekCallback?) {
         super.onPartitionsAssigned(assignments, callback)
@@ -19,8 +16,4 @@ class KotlinConsumer: AbstractConsumerSeekAware() {
         }
     }
 
-    @KafkaListener(topics = ["simple-message-topic"], groupId = "simple-kotlin-consumer")
-    fun processMessage(message: String) {
-        logger.info("got message: {}", message)
-    }
 }
