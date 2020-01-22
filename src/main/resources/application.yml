@@ -1,0 +1,7 @@
+
+spring:
+    kafka:
+        consumer:
+            bootstrap-servers: 192.168.99.100:9092
+        producer:
+            bootstrap-servers: 192.168.99.100:9092
