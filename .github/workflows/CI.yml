@@ -50,5 +50,5 @@ jobs:
       - name: Run tests
         run: |
           docker ps
-          docker exec -i kafka "./opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test"
+          docker exec -i kafka sh -c "./opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test"
           sleep 15000
