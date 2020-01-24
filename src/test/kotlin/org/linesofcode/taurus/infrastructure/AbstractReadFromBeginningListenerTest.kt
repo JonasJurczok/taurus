@@ -2,16 +2,16 @@ package org.linesofcode.taurus.infrastructure
 
 import org.apache.kafka.clients.admin.AdminClient
 import org.apache.kafka.clients.admin.NewTopic
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Scope
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry
 import org.springframework.kafka.core.KafkaAdmin
@@ -22,6 +22,8 @@ import java.util.concurrent.TimeUnit
 
 @SpringBootTest
 class AbstractReadFromBeginningListenerTest {
+    val topicName = "ListenerTest"
+    val logger = LoggerFactory.getLogger(AbstractReadFromBeginningListenerTest::class.java)
 
     @Autowired
     @Suppress("SpringJavaInjectionPointsAutowiringInspection")
@@ -37,45 +39,44 @@ class AbstractReadFromBeginningListenerTest {
     @Suppress("SpringJavaInjectionPointsAutowiringInspection")
     private lateinit var listenerRegistry: KafkaListenerEndpointRegistry
 
-    @Test
-    fun listenerShouldAlwaysReadFromBeginning() {
-        val topicName = "ListenerTest"
+    @BeforeEach
+    fun setup() {
+        logger.info("Creating topic [{}].", topicName)
         val adminClient = AdminClient.create(kafkaAdmin.config)
         adminClient.createTopics(listOf(NewTopic(topicName, 1, 1)))
+    }
 
+    @AfterEach
+    fun teardown() {
+        logger.info("Deleting topic [{}].", topicName)
+        val adminClient = AdminClient.create(kafkaAdmin.config)
+        adminClient.deleteTopics(listOf(topicName))
+    }
+
+    @Test
+    fun `listener should always read from beginning of queue`() {
         kafkaTemplate.send(topicName, "Message1")
         kafkaTemplate.send(topicName, "Message2")
         kafkaTemplate.send(topicName, "Message3")
 
-        val latch = CountDownLatch(3)
+        // instantiate the kafka listener through spring
         val listener: TestListener = applicationContext.getBean("TestListener") as TestListener
-        listener.latch = latch
 
+        // Start the listener
         listenerRegistry.getListenerContainer("TestListener").start()
 
-        assertTrue(latch.await(10, TimeUnit.SECONDS))
-
-        adminClient.deleteTopics(listOf(topicName))
+        assertTrue(listener.latch.await(10, TimeUnit.SECONDS))
     }
 
     class TestListener: AbstractReadFromBeginningListener() {
         override val logger = LoggerFactory.getLogger("TestListener")
 
-        lateinit var latch: CountDownLatch
+        val latch = CountDownLatch(3)
 
         @KafkaListener(topics = ["ListenerTest"], groupId = "ListenerTest", autoStartup = "false", id = "TestListener")
         fun processMessage(event: String) {
             logger.info("got message: {}", event)
             latch.countDown()
         }
-    }
-}
-
-@Configuration
-class AbstractReadFromBeginningListenerTestConfig {
-    @Bean("TestListener")
-    @Scope(BeanDefinition.SCOPE_PROTOTYPE)
-    fun listener(): AbstractReadFromBeginningListenerTest.TestListener {
-        return AbstractReadFromBeginningListenerTest.TestListener()
     }
 }
