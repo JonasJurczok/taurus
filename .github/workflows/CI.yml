@@ -54,4 +54,4 @@ jobs:
       - name: Run tests
         run: |
           docker ps
-          docker exec -it kafka /bin/bash && ./opt/kafka/bin/kafka-console-consumer --bootstrap-server localhost:9092 --topic test
+          docker exec -i kafka /bin/bash && ./opt/kafka/bin/kafka-console-consumer --bootstrap-server localhost:9092 --topic test
