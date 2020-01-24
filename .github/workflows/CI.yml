@@ -45,6 +45,10 @@ jobs:
       - uses: actions/checkout@v1
         with:
           fetch-depth: '0'
+      - name: setup java
+        uses: actions/setup-java@v1
+        with:
+          java-version: '11'
       - name: Run tests
         run: |
-          mvn clean verify
+          mvn -B clean verify
