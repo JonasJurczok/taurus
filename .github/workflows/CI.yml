@@ -22,16 +22,16 @@ jobs:
         image: wurstmeister/kafka:2.12-2.3.0
         env:
           KAFKA_ADVERTISED_LISTENERS: >-
-                LISTENER_DOCKER_INTERNAL://localhost:19092,
+                LISTENER_DOCKER_INTERNAL://kafka:19092,
                 LISTENER_DOCKER_EXTERNAL://localhost:9092
           KAFKA_LISTENERS: >-
-                LISTENER_DOCKER_INTERNAL://localhost:19092,
+                LISTENER_DOCKER_INTERNAL://kafka:19092,
                 LISTENER_DOCKER_EXTERNAL://:9092
           KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: >-
                 LISTENER_DOCKER_INTERNAL:PLAINTEXT,
                 LISTENER_DOCKER_EXTERNAL:PLAINTEXT
           KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
-          KAFKA_ZOOKEEPER_CONNECT: localhost:2181
+          KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
           KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
           KAFKA_LOG4J_LOGGERS: >-
                 kafka.controller=INFO,
@@ -50,5 +50,5 @@ jobs:
       - name: Run tests
         run: |
           docker ps
-          docker exec -i kafka sh -c "./opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test"
+          docker exec -i kafka sh -c "./opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server kafka:19092 --topic test"
           sleep 15000
