@@ -25,7 +25,7 @@ jobs:
                 LISTENER_DOCKER_EXTERNAL://127.0.0.1:9092
           KAFKA_LISTENERS: >-
                 LISTENER_DOCKER_INTERNAL://127.0.0.1:19092,
-                LISTENER_DOCKER_EXTERNAL://127.0.0.1:9092
+                LISTENER_DOCKER_EXTERNAL://:9092
           KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: >-
                 LISTENER_DOCKER_INTERNAL:PLAINTEXT,
                 LISTENER_DOCKER_EXTERNAL:PLAINTEXT
@@ -50,4 +50,4 @@ jobs:
           java-version: '11'
       - name: Run tests
         run: |
-          mvn -B clean verify
+          docker exec -it kafka /bin/bash && ./opt/kafka/bin/kafka-console-consumer --bootstrap-server localhost:9092 --topic test
