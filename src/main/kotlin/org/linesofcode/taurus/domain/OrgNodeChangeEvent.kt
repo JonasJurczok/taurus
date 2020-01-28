@@ -1,4 +1,4 @@
-package org.linesofcode.taurus.orgstructure
+package org.linesofcode.taurus.domain
 
 import java.util.UUID
 
