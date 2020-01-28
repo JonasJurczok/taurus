@@ -1,6 +1,7 @@
 package org.linesofcode.taurus
 
 import org.apache.kafka.clients.admin.AdminClient
+import org.apache.kafka.clients.admin.NewTopic
 import org.linesofcode.taurus.infrastructure.AbstractReadFromBeginningListenerTest
 import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.context.annotation.Bean
@@ -20,5 +21,10 @@ class TestConfigurarion {
     @Bean
     fun kafkaAdminClient(admin: KafkaAdmin): AdminClient {
         return AdminClient.create(admin.config)
+    }
+
+    @Bean
+    fun staffOrgNodeChangeTopic(): NewTopic {
+        return NewTopic("staff-org-node-change", 1, 1)
     }
 }

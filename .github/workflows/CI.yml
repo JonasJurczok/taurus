@@ -42,6 +42,12 @@ jobs:
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock
         options: --name kafka
+
+      redis:
+        options: --name redis
+        image: redis
+        ports:
+          - "6379:6379"
         
     steps:
       - uses: actions/checkout@v2
@@ -54,8 +60,10 @@ jobs:
       - name: Cache maven repo
         uses: actions/cache@v1
         with:
-          path: ~/.m2/
-          key: Taurus
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
       - name: Run tests
         run: |
           docker ps
