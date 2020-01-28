@@ -28,6 +28,10 @@ class RedisImportTest {
     private lateinit var orgNodeOperations: HashOperations<String, UUID, OrgNode>
 
     @BeforeEach
+    fun initialize() {
+        cleanup()
+    }
+
     @AfterEach
     fun cleanup() {
         orgNodeTemplate.execute<Any> { con -> con.flushAll() }
