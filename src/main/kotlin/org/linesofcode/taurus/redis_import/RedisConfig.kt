@@ -14,6 +14,11 @@ import java.util.UUID
 @Configuration
 class RedisConfig {
 
+    companion object {
+        const val ORG_NODE_KEY = "OrgNode"
+        const val IDENTITY_KEY = "Identity"
+    }
+
     @Bean
     fun orgNodeRedisTemplate(factory: RedisConnectionFactory): RedisTemplate<String, OrgNode> {
         val template = RedisTemplate<String, OrgNode>()

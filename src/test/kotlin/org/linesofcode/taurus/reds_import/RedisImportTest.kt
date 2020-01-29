@@ -12,6 +12,8 @@ import org.linesofcode.taurus.domain.Identity.IdentityType.HUMAN
 import org.linesofcode.taurus.domain.IdentityChangeEvent
 import org.linesofcode.taurus.domain.OrgNode
 import org.linesofcode.taurus.domain.OrgNodeChangeEvent
+import org.linesofcode.taurus.redis_import.RedisConfig.Companion.IDENTITY_KEY
+import org.linesofcode.taurus.redis_import.RedisConfig.Companion.ORG_NODE_KEY
 import org.linesofcode.taurus.redis_import.RedisImporter
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -57,7 +59,7 @@ class RedisImportTest {
 
         redisImporter.importOrgEvents(event)
 
-        val node: OrgNode? = await(2000) {orgNodeOperations.get("OrgNode", event.orgNode.id)}
+        val node: OrgNode? = await(2000) {orgNodeOperations.get(ORG_NODE_KEY, event.orgNode.id)}
 
         assertTrue(node != null)
         assertEquals(event.orgNode.name, node?.name)
@@ -68,7 +70,7 @@ class RedisImportTest {
         val event = OrgNodeChangeEvent(UUID.randomUUID(), CREATE, OrgNode(UUID.randomUUID(), "Root node"))
         redisImporter.importOrgEvents(event)
 
-        val node: OrgNode? = await(2000) {orgNodeOperations.get("OrgNode", event.orgNode.id)}
+        val node: OrgNode? = await(2000) {orgNodeOperations.get(ORG_NODE_KEY, event.orgNode.id)}
 
         assertTrue(node != null)
         assertEquals(event.orgNode.name, node?.name)
@@ -76,7 +78,7 @@ class RedisImportTest {
         val updateEvent = OrgNodeChangeEvent(UUID.randomUUID(), UPDATE, OrgNode(event.orgNode.id, "Root node 2"))
         redisImporter.importOrgEvents(updateEvent)
 
-        val updatedNode: OrgNode? = await(2000) {orgNodeOperations.get("OrgNode", event.orgNode.id)}
+        val updatedNode: OrgNode? = await(2000) {orgNodeOperations.get(ORG_NODE_KEY, event.orgNode.id)}
 
         assertTrue(updatedNode != null)
         assertEquals(updateEvent.orgNode.name, updatedNode?.name)
@@ -88,7 +90,7 @@ class RedisImportTest {
 
         redisImporter.importIdentityEvents(event)
 
-        val identity: Identity? = await(2000) {identityOperations.get("Identity", event.identity.id)}
+        val identity: Identity? = await(2000) {identityOperations.get(IDENTITY_KEY, event.identity.id)}
 
         assertTrue(identity != null)
         assertEquals(event.identity.name, identity?.name)
@@ -101,7 +103,7 @@ class RedisImportTest {
         val event = IdentityChangeEvent(UUID.randomUUID(), CREATE, Identity(UUID.randomUUID(), "Jason Miles", "miles@example.com", HUMAN))
         redisImporter.importIdentityEvents(event)
 
-        val identity: Identity? = await(2000) {identityOperations.get("Identity", event.identity.id)}
+        val identity: Identity? = await(2000) {identityOperations.get(IDENTITY_KEY, event.identity.id)}
 
         assertTrue(identity != null)
         assertEquals(event.identity.name, identity?.name)
@@ -111,7 +113,7 @@ class RedisImportTest {
         val updateEvent = IdentityChangeEvent(UUID.randomUUID(), UPDATE, Identity(event.identity.id, "Martin Huber", "huber@example.com", HUMAN))
         redisImporter.importIdentityEvents(updateEvent)
 
-        val updatedIdentity: Identity? = await(2000) {identityOperations.get("Identity", event.identity.id)}
+        val updatedIdentity: Identity? = await(2000) {identityOperations.get(IDENTITY_KEY, event.identity.id)}
 
         assertTrue(updatedIdentity != null)
         assertEquals(updateEvent.identity.name, updatedIdentity?.name)
