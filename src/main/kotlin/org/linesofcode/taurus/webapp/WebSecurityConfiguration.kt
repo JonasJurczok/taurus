@@ -4,7 +4,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 
 @EnableWebSecurity
 class WebSecurityConfiguration: WebSecurityConfigurerAdapter() {
@@ -15,27 +14,25 @@ class WebSecurityConfiguration: WebSecurityConfigurerAdapter() {
                 ?.anyRequest()?.authenticated()
                 ?.and()
                     ?.formLogin()
-                    ?.successForwardUrl("/?login_success")
-                    ?.failureForwardUrl("/?login_error&login")
-                    ?.loginPage("/?login")
+                    ?.loginPage("/")
                     ?.permitAll()
                 ?.and()
                 ?.logout()
                     ?.invalidateHttpSession(true)
                     ?.clearAuthentication(true)
-                    ?.logoutRequestMatcher(AntPathRequestMatcher("/logout"))
-                    ?.logoutSuccessUrl("/login?logout")
+                    ?.logoutUrl("/logout")
+                    ?.logoutSuccessUrl("/?logout")
                     ?.permitAll()
     }
 
     override fun configure(auth: AuthenticationManagerBuilder?) {
         auth?.inMemoryAuthentication()
                 ?.withUser("alice@example.com")
-                ?.password("alice")
+                ?.password("{noop}alice")
                 ?.roles("USER")
                 ?.and()
                 ?.withUser("bob@example.com")
-                ?.password("bob")
+                ?.password("{noop}bob")
                 ?.roles("USER")
     }
 }

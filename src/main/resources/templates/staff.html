@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Taurus Staff Utils</title>
+</head>
+<body>
+<div layout:fragment="content" th:remove="tag">
+    <h1>Staff App utils</h1>
+    <p>This is a fake staff app to produce employees and organisational hierarchy.</p>
+
+    <h2>Create organisational hierarchy</h2>
+    <form th:action="@{/orgnode}" method="post" th:object="${orgNode}">
+        <div class="form-group">
+            <label for="name">name</label>
+            <input type="text" class="form-control" id="name" aria-describedby="orgNodeHelp" th:field="*{name}">
+            <small id="orgNodeHelp" class="form-text text-muted">The name of the organisational node you want to create.</small>
+        </div>
+        <button type="submit" class="btn btn-primary">Create</button>
+    </form>
+
+
+</div>
+</body>
+</html>

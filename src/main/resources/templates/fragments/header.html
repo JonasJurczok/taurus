@@ -13,19 +13,42 @@
                     <img th:src="@{/img/Taurus.png}" alt="Taurus logo" th:width="30" th:height="30"/>
                 </a>
 
-                <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-                    <li class="nav-item active">
+                <ul class="navbar-nav mr-auto mt-2 mt-lg-0" th:with="view=${#httpServletRequest.getServletPath()}">
+                    <li class="nav-item " th:classappend="${#strings.equals(view, '/')? 'active' : ''}">
                         <a class="nav-link" th:href="@{/}">Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Link</a>
+                    <li class="nav-item" th:classappend="${#strings.equals(view, '/staff')? 'active' : ''}">
+                        <a class="nav-link" href="/staff">Staff App</a>
                     </li>
                 </ul>
 
-                <form class="form-inline my-2 my-lg-0">
-                    <input class="form-control mr-sm-2" type="search" placeholder="Search">
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+
+                <form class="form-inline my-2 my-lg-0" sec:authorize="isAnonymous()" th:action="@{/}" method="post"
+                      th:classappend="${param.error != null ? 'was-validated' : ''}">
+                    <input type="email"
+                           id="username"
+                           name="username"
+                           class="form-control mr-sm-2"
+                           autofocus="autofocus"
+                           placeholder="Username"
+                           required="true">
+
+                    <div class="invalid-tooltip" th:if="${param.error}">
+                        Username or password invalid.
+                    </div>
+                    <input type="password"
+                           id="password"
+                           name="password"
+                           class="form-control mr-sm-2"
+                           placeholder="Password"
+                           required="true">
+
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Login</button>
                 </form>
+                <form class="form-inline my-2 my-lg-0" sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Logout</button>
+                </form>
+
             </div>
         </div>
     </nav>
