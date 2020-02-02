@@ -17,7 +17,7 @@
                     <li class="nav-item " th:classappend="${#strings.equals(view, '/')? 'active' : ''}">
                         <a class="nav-link" th:href="@{/}">Home</a>
                     </li>
-                    <li class="nav-item" th:classappend="${#strings.equals(view, '/staff')? 'active' : ''}">
+                    <li class="nav-item" th:classappend="${#strings.equals(view, '/staff') or #strings.equals(view, '/orgnode')? 'active' : ''}">
                         <a class="nav-link" href="/staff">Staff App</a>
                     </li>
                 </ul>

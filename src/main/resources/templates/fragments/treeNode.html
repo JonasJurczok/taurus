@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+</head>
+
+<body>
+<th:block th:fragment="treeNode" th:each="node: ${nodes}">
+    <li>
+        <i onclick="loadChildren(this.id)" th:id="${node.id}" th:unless="${node.children.isEmpty()}" class="fas fa-angle-right rotate"></i>
+        <span th:inline="text">
+                        <i class="far fa-building ic-w mr-1"></i>
+                        [[${node.name}]]
+                    </span>
+        <ul class="nested" th:id="${node.id} + '-nested'" id= class="nested" th:unless="${node.children.isEmpty()}">
+        </ul>
+    </li>
+</th:block>
+</body>
+</html>

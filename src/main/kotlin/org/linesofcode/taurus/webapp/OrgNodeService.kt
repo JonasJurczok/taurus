@@ -5,11 +5,15 @@ import org.linesofcode.taurus.domain.Action.UPDATE
 import org.linesofcode.taurus.domain.OrgNode
 import org.linesofcode.taurus.domain.OrgNodeChangeEvent
 import org.linesofcode.taurus.redis_import.RedisConfig
+import org.linesofcode.taurus.redis_import.RedisConfig.Companion.ORG_NODE_KEY
+import org.linesofcode.taurus.redis_import.RedisConfig.Companion.ORG_NODE_ROOT_KEY
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.redis.core.HashOperations
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
 import java.lang.IllegalArgumentException
+import java.util.ArrayList
+import java.util.HashSet
 import java.util.UUID
 
 @Service
@@ -31,10 +35,7 @@ class OrgNodeService {
 
         if (orgNode.parent != null) {
             val parent = getById(orgNode.parent)
-
-            if (parent == null) {
-                throw IllegalArgumentException("Parent with id ${parent?.id} does not exist.")
-            }
+                    ?: throw IllegalArgumentException("Parent with id ${orgNode.parent} does not exist.")
 
             // add org node to children
             val updatedParent = OrgNode(parent.id, parent.name, parent.parent, parent.children.plus(orgNode.id))
@@ -44,11 +45,21 @@ class OrgNodeService {
     }
 
     fun getById(id: UUID): OrgNode? {
-        return orgNodeOperations.get(RedisConfig.ORG_NODE_KEY, id)
+        return orgNodeOperations.get(ORG_NODE_KEY, id)
     }
 
     fun getAll(): Set<OrgNode> {
         // TODO: this should be streamed.
-        return orgNodeOperations.values(RedisConfig.ORG_NODE_KEY).toHashSet()
+        return orgNodeOperations.values(ORG_NODE_KEY).toHashSet()
+    }
+
+    fun getRootNodes(): Set<OrgNode> {
+        return orgNodeOperations.values(ORG_NODE_ROOT_KEY).sortedBy { node -> node.name }.toHashSet()
+    }
+
+    fun getChildrenById(id: UUID): Set<OrgNode> {
+        val node = orgNodeOperations.get(ORG_NODE_KEY, id)
+
+        return orgNodeOperations.multiGet(ORG_NODE_KEY, ArrayList<UUID>(node?.children?.toMutableList())).toSet()
     }
 }

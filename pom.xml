@@ -72,6 +72,16 @@
 			<artifactId>popper.js</artifactId>
 			<version>1.16.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.webjars.npm</groupId>
+			<artifactId>mdbootstrap</artifactId>
+			<version>4.11.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>font-awesome</artifactId>
+			<version>5.12.0</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.jetbrains.kotlin</groupId>

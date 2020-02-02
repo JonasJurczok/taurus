@@ -7,8 +7,14 @@ import org.springframework.stereotype.Controller
 import org.springframework.ui.ModelMap
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.ModelAttribute
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.RequestMethod.GET
+import org.springframework.web.bind.annotation.RequestMethod.POST
+import org.springframework.web.bind.annotation.RequestParam
+import java.util.UUID
+import kotlin.math.log
 
 @Controller
 class OrgNodeController {
@@ -17,7 +23,7 @@ class OrgNodeController {
     @Autowired
     private lateinit var orgNodeService: OrgNodeService
 
-    @RequestMapping("/staff", method = [RequestMethod.GET, RequestMethod.POST])
+    @RequestMapping("/staff", method = [GET, POST])
     fun staff(model: ModelMap): String {
         model.mergeAttributes(
                 mapOf(
@@ -29,7 +35,7 @@ class OrgNodeController {
         return "staff"
     }
 
-    @RequestMapping("/orgnode", method = [RequestMethod.POST])
+    @RequestMapping("/orgnode", method = [POST])
     fun orgNode(@ModelAttribute orgNode: OrgNode, bindingResult: BindingResult, model: ModelMap): String {
         if (bindingResult.hasErrors()) {
             return "staff"
@@ -44,5 +50,12 @@ class OrgNodeController {
         return "staff"
     }
 
+    @RequestMapping("/orgnode/{id}/children", method = [GET])
+    fun children(@PathVariable id: UUID, model: ModelMap): String {
+        logger.info("Searching for children of [{}].", id)
 
+        model.addAttribute("nodes", orgNodeService.getChildrenById(id))
+
+        return "fragments/treeNode :: treeNode"
+    }
 }
