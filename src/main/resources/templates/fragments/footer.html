@@ -1,0 +1,26 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<body>
+<th:block th:fragment="footer">
+    <footer>
+        <div class="container">
+            <p>
+                &copy; linesofcode.org
+                <span sec:authorize="isAuthenticated()" style="display: inline-block;">
+                    | Logged user: <span sec:authentication="name"></span> |
+                    Roles: <span sec:authentication="principal.authorities"></span> |
+                    <a th:href="@{/logout}">Sign Out</a>
+                </span>
+            </p>
+        </div>
+    </footer>
+
+    <script type="text/javascript" th:src="@{/webjars/popper.js/1.16.0/umd/popper.js/}"></script>
+    <script type="text/javascript" th:src="@{/webjars/bootstrap/4.4.1/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/bootstrap-select/1.13.11/js/bootstrap-select.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/mdbootstrap/4.11.0/js/mdb.min.js}"></script>
+
+</th:block>
+</body>
+</html>

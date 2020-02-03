@@ -11,3 +11,15 @@ spring:
             value-deserializer: 'org.springframework.kafka.support.serializer.JsonDeserializer'
             properties:
                 spring.json.trusted.packages: org.linesofcode.taurus.domain
+
+    thymeleaf:
+        cache: false
+        check-template: true
+        check-template-location: true
+        servlet:
+            content-type: text/html
+        enabled: true
+        encoding: UTF-8
+        mode: HTML
+        prefix: classpath:/templates/
+        suffix: .html

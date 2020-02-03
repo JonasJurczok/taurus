@@ -6,6 +6,7 @@ import org.linesofcode.taurus.domain.OrgNode
 import org.linesofcode.taurus.domain.OrgNodeChangeEvent
 import org.linesofcode.taurus.redis_import.RedisConfig.Companion.IDENTITY_KEY
 import org.linesofcode.taurus.redis_import.RedisConfig.Companion.ORG_NODE_KEY
+import org.linesofcode.taurus.redis_import.RedisConfig.Companion.ORG_NODE_ROOT_KEY
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.redis.core.HashOperations
@@ -27,7 +28,15 @@ class RedisImporter {
     fun importOrgEvents(event: OrgNodeChangeEvent) {
 
         logger.info("Importing org node event [{}].", event)
-        orgNodeOperations.put(ORG_NODE_KEY, event.orgNode.id, event.orgNode)
+        val orgNode = event.orgNode
+
+        if (orgNode.parent == null) {
+            orgNodeOperations.put(ORG_NODE_ROOT_KEY, orgNode.id, orgNode)
+        } else {
+            orgNodeOperations.delete(ORG_NODE_ROOT_KEY, orgNode.id)
+        }
+
+        orgNodeOperations.put(ORG_NODE_KEY, orgNode.id, orgNode)
     }
 
     @KafkaListener(topics = [IdentityChangeEvent.TOPIC_NAME], groupId = "taurus-redis-importer-identity", id = "redis-identity-governance-identity-change")

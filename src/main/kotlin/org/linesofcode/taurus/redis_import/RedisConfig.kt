@@ -16,6 +16,7 @@ class RedisConfig {
 
     companion object {
         const val ORG_NODE_KEY = "OrgNode"
+        const val ORG_NODE_ROOT_KEY = "OrgNodeRoot"
         const val IDENTITY_KEY = "Identity"
     }
 
