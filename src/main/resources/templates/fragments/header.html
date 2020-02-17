@@ -15,10 +15,16 @@
 
                 <ul class="navbar-nav mr-auto mt-2 mt-lg-0" th:with="view=${#httpServletRequest.getServletPath()}">
                     <li class="nav-item " th:classappend="${#strings.equals(view, '/')? 'active' : ''}">
-                        <a class="nav-link" th:href="@{/}">Home</a>
+                        <a class="nav-link" th:href="@{/}">identity governance</a>
                     </li>
-                    <li class="nav-item" th:classappend="${#strings.equals(view, '/staff') or #strings.equals(view, '/orgnode')? 'active' : ''}">
-                        <a class="nav-link" href="/staff">Staff App</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="staffDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Staff App
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="staffDropdown">
+                            <a class="dropdown-item" th:classappend="${#strings.equals(view, '/orgnode') ? 'active' : ''}" href="/orgnode">organisational hierarchy</a>
+                            <a class="dropdown-item" th:classappend="${#strings.equals(view, '/staff') ? 'active' : ''}" href="/identity">identities</a>
+                        </div>
                     </li>
                 </ul>
 

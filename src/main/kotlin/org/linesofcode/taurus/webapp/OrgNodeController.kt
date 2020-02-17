@@ -6,15 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.ui.ModelMap
 import org.springframework.validation.BindingResult
+import org.springframework.validation.ObjectError
 import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestMethod.GET
 import org.springframework.web.bind.annotation.RequestMethod.POST
-import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.ResponseBody
+import java.lang.IllegalStateException
 import java.util.UUID
-import kotlin.math.log
 
 @Controller
 class OrgNodeController {
@@ -23,38 +23,57 @@ class OrgNodeController {
     @Autowired
     private lateinit var orgNodeService: OrgNodeService
 
-    @RequestMapping("/staff", method = [GET, POST])
-    fun staff(model: ModelMap): String {
-        model.mergeAttributes(
-                mapOf(
-                        "orgNode" to OrgNode(),
-                        "created" to null,
-                        "orgNodes" to orgNodeService.getAll()
-                )
-        )
-        return "staff"
+    @Autowired
+    private lateinit var identityService: IdentityService
+
+    //TODO: allow editing of orgnodes
+
+    @RequestMapping("/orgnode", method = [GET])
+    fun orgnodeGet(model: ModelMap): String {
+        fillModel(model)
+        return "orgnode"
     }
 
     @RequestMapping("/orgnode", method = [POST])
-    fun orgNode(@ModelAttribute orgNode: OrgNode, bindingResult: BindingResult, model: ModelMap): String {
+    fun createOrgNode(@ModelAttribute orgNode: OrgNode, bindingResult: BindingResult, model: ModelMap): String {
         if (bindingResult.hasErrors()) {
-            return "staff"
+            return "orgnode"
         }
 
         logger.info("Got OrgNode [{}] from website.", orgNode)
-        orgNodeService.create(orgNode)
+        // catch illegalState
+        val created = try {
+            orgNodeService.createOrUpdate(orgNode)
+            orgNode.name
+        } catch (e: IllegalStateException) {
+            bindingResult.addError(ObjectError("", e.message ?: ""))
+            null
+        }
+        fillModel(model, created)
 
-        model.addAttribute("created", orgNode.name)
+        return "orgnode"
+    }
+
+    private fun fillModel(model: ModelMap, created: String? = null) {
         model.addAttribute("orgNode", OrgNode())
+        model.addAttribute("created", created)
         model.addAttribute("orgNodes", orgNodeService.getAll())
-        return "staff"
+        model.addAttribute("identities", identityService.getAll())
+    }
+
+    @RequestMapping("/orgnode/{id}", method = [GET])
+    @ResponseBody
+    fun getById(@PathVariable id: UUID): OrgNode? {
+        return orgNodeService.getById(id)
     }
 
     @RequestMapping("/orgnode/{id}/children", method = [GET])
     fun children(@PathVariable id: UUID, model: ModelMap): String {
         logger.info("Searching for children of [{}].", id)
 
-        model.addAttribute("nodes", orgNodeService.getChildrenById(id))
+        model.addAttribute("nodes", orgNodeService.getChildrenById(id).map {
+            node: OrgNode ->
+            node.toDTO(node.manager?.let { identityService.getById(it) }, identityService.getByIds(node.members))})
 
         return "fragments/treeNode :: treeNode"
     }
