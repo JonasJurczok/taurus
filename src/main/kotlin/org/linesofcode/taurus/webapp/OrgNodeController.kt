@@ -61,10 +61,23 @@ class OrgNodeController {
         model.addAttribute("identities", identityService.getAll())
     }
 
-    @RequestMapping("/orgnode/{id}", method = [GET])
+    @RequestMapping("/orgnode/{id}", method = [GET], produces = ["application/json"])
     @ResponseBody
     fun getById(@PathVariable id: UUID): OrgNode? {
         return orgNodeService.getById(id)
+    }
+
+    @RequestMapping("/orgnode/{id}", method = [GET], produces = ["text/html"])
+    fun getDetailsHTMLByID(@PathVariable id: UUID, model: ModelMap): String {
+        val node = orgNodeService.getById(id)
+
+        logger.info("Getting nodeDetails as HTML for id [$id]")
+
+        model.addAttribute("node", node?.toDTO(
+                node.manager?.let { identityService.getById(it) },
+                node.members.mapNotNull { identityService.getById(it) }.toSet())
+        )
+        return "fragments/nodeDetails :: nodeDetails"
     }
 
     @RequestMapping("/orgnode/{id}/children", method = [GET])

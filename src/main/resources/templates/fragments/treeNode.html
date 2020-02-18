@@ -5,10 +5,10 @@
 <body>
 <!--/*@thymesVar id="nodes" type="java.util.List<org.linesofcode.taurus.webapp.dto.OrgNodeDTO>"*/-->
 <th:block th:fragment="treeNode" th:each="node: ${nodes}">
-    <li>
+    <li th:id="${node.id}">
         <!--<i onclick="loadChildren(this.id)" th:id="${node.id}" th:unless="${node.children.isEmpty()}" class="fas fa-angle-right rotate"></i>-->
-        <i onclick="loadChildren(this.id)" th:id="${node.id}" class="fas fa-angle-right rotate"></i>
-        <span th:inline="text">
+        <i onclick="loadChildren(this.parentElement.id)"  class="fas fa-angle-right rotate"></i>
+        <span th:inline="text" onclick="loadDetails(this)">
                         <i class="far fa-building ic-w mr-1"></i>
                         [[${node.name}]]
                     </span>

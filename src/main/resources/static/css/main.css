@@ -13,3 +13,17 @@ footer {
 footer p {
     padding: 15px;
 }
+
+.opened {
+    background-color: rgb(50, 160, 255);
+    transition: all .1s linear;
+}
+
+.opened:hover {
+    color: #f8f9fa;
+    background-color: rgb(50, 160, 255);
+}
+
+.opened span {
+    color: #f8f9fa;
+}
