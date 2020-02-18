@@ -24,14 +24,4 @@ class TestConfigurarion {
     fun kafkaAdminClient(admin: KafkaAdmin): AdminClient {
         return AdminClient.create(admin.config)
     }
-
-    @Bean
-    fun staffOrgNodeChangeTopic(): NewTopic {
-        return NewTopic(OrgNodeChangeEvent.TOPIC_NAME, 1, 1)
-    }
-
-    @Bean
-    fun identityChangeTopic(): NewTopic {
-        return NewTopic(IdentityChangeEvent.TOPIC_NAME, 1, 1)
-    }
 }

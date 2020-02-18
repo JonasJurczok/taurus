@@ -2,18 +2,29 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org" lang="en">
 
-<head>
-</head>
-
 <body>
+<!--/*@thymesVar id="nodes" type="java.util.List<org.linesofcode.taurus.webapp.dto.OrgNodeDTO>"*/-->
 <th:block th:fragment="treeNode" th:each="node: ${nodes}">
-    <li>
-        <i onclick="loadChildren(this.id)" th:id="${node.id}" th:unless="${node.children.isEmpty()}" class="fas fa-angle-right rotate"></i>
-        <span th:inline="text">
+    <li th:id="${node.id}">
+        <!--<i onclick="loadChildren(this.id)" th:id="${node.id}" th:unless="${node.children.isEmpty()}" class="fas fa-angle-right rotate"></i>-->
+        <i onclick="loadChildren(this.parentElement.id)"  class="fas fa-angle-right rotate"></i>
+        <span th:inline="text" onclick="loadDetails(this)">
                         <i class="far fa-building ic-w mr-1"></i>
                         [[${node.name}]]
                     </span>
-        <ul class="nested" th:id="${node.id} + '-nested'" id= class="nested" th:unless="${node.children.isEmpty()}">
+        <ul class="nested">
+            <li th:if="${node.manager != null}" th:inline="text">
+                <i class="far fa-user ic-w mr-1"></i>
+                [[${node.manager.name}]]
+            </li>
+            <th:block th:each="member: ${node.members}">
+                <li th:inline="text">
+                    <i class="far fa-user-circle ic-w mr-1"></i>
+                    [[${member.name}]]
+                </li>
+            </th:block>
+        </ul>
+        <ul class="nested" th:id="${node.id} + '-nested'" th:unless="${node.children.isEmpty()}">
         </ul>
     </li>
 </th:block>

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<body>
+<!--/*@thymesVar id="node" type="org.linesofcode.taurus.webapp.dto.OrgNodeDTO"*/-->
+<th:block th:fragment="nodeDetails">
+    <h6 class="pt-3 pl-3" th:inline="text">[[${node.name}]] details</h6>
+    <div th:inline="text">name: [[${node.name}]]</div>
+    <div th:inline="text">manager: [[${node.manager.name}]]</div>
+</th:block>
+</body>
+</html>

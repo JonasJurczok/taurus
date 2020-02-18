@@ -9,12 +9,19 @@
 <div layout:fragment="content" th:remove="tag">
     <h1>Roles and Identities</h1>
 
-    <div class="treeview border" style="width: 48% !important;" sec:authorize="isAuthenticated()">
-        <h6 class="pt-3 pl-3">Organisational structure and identities</h6>
-        <hr>
-        <ul class="mb-1 pl-3 pb-2">
-            <th:block th:replace="fragments/treeNode.html :: treeNode(nodes = ${rootNodes})"/>
-        </ul>
+    <div class="row">
+        <div class="treeview border col-6" sec:authorize="isAuthenticated()">
+            <h6 class="pt-3 pl-3">Organisational structure and identities</h6>
+            <hr>
+            <ul class="mb-1 pl-3 pb-2">
+                <th:block th:replace="fragments/treeNode.html :: treeNode(nodes = ${rootNodes})"/>
+            </ul>
+        </div>
+        <div id="details" class="border col-6" sec:authorize="isAuthenticated()">
+            <h6 class="pt-3 pl-3">OrgNode details</h6>
+
+
+        </div>
     </div>
 
     <script>
@@ -31,7 +38,15 @@
             $(nested).load('/orgnode/' + id + '/children', function() {
                 $('.treeview').mdbTreeview();
             });
-        }
+        };
+
+        loadDetails = function(span) {
+            $('span').removeClass("opened");
+            span.classList.add("opened");
+            let id = span.parentElement.id;
+
+            $("#details").load('/orgnode/' + id)
+        };
     </script>
 </div>
 </body>

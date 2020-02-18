@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Taurus Staff Utils</title>
+</head>
+<body>
+<div layout:fragment="content" th:remove="tag">
+    <h1>Identity management</h1>
+    <p>This is a fake staff app to manage identities.</p>
+
+    <div class="alert alert-success alert-dismissible fade show" role="alert" th:if="${created != null}">
+        Identity with name <span th:text="${created}"></span> created successfully.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <form th:action="@{/identity}" method="post" th:object="${identity}">
+        <div class="form-group">
+            <label for="name">name</label>
+            <input type="text" class="form-control" id="name" aria-describedby="nameHelp" th:field="*{name}">
+            <small id="nameHelp" class="form-text text-muted">The name of the identity you want to create.</small>
+        </div>
+        <div class="form-group">
+            <label for="email">email</label>
+            <input type="text" class="form-control" id="email" aria-describedby="emailHelp" th:field="*{email}">
+            <small id="emailHelp" class="form-text text-muted">The email address of the identity you want to create.</small>
+        </div>
+        <div class="form-group">
+            <label for="type">type</label>
+            <select class="selectpicker form-control" th:field="*{type}" id="type" aria-describedby="typeHelp">
+                <option value="HUMAN" >human</option>
+                <option value="MACHINE">machine</option>
+            </select>
+            <small id="typeHelp" class="form-text text-muted">The type of the identity to create</small>
+        </div>
+        <button type="submit" class="btn btn-primary">Create</button>
+    </form>
+
+</div>
+</body>
+</html>

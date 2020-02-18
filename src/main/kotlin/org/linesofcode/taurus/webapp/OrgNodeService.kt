@@ -1,6 +1,7 @@
 package org.linesofcode.taurus.webapp
 
 import org.linesofcode.taurus.domain.Action
+import org.linesofcode.taurus.domain.Action.CREATE
 import org.linesofcode.taurus.domain.Action.UPDATE
 import org.linesofcode.taurus.domain.OrgNode
 import org.linesofcode.taurus.domain.OrgNodeChangeEvent
@@ -12,33 +13,38 @@ import org.springframework.data.redis.core.HashOperations
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
 import java.lang.IllegalArgumentException
+import java.lang.IllegalStateException
 import java.util.ArrayList
 import java.util.HashSet
 import java.util.UUID
 
 @Service
-class OrgNodeService {
-
-    @Autowired
-    private lateinit var kafkaTemplate: KafkaTemplate<UUID, OrgNodeChangeEvent>
-
-    @Autowired
-    private lateinit var orgNodeOperations: HashOperations<String, UUID, OrgNode>
+class OrgNodeService(@Autowired val kafkaTemplate: KafkaTemplate<UUID, OrgNodeChangeEvent>,
+                     @Autowired val orgNodeOperations: HashOperations<String, UUID, OrgNode>) {
 
     /**
      * Create a new OrgNode.
      * If parent is set, the new orgNode will be added as a child to the parent.
      */
-    fun create(orgNode: OrgNode) {
+    fun createOrUpdate(orgNode: OrgNode) {
+        val existingNode = orgNodeOperations.get(ORG_NODE_KEY, orgNode.id)
+
+        existingNode?.let { it.version != orgNode.version}
+        if (existingNode != null && existingNode.version != orgNode.version) {
+            throw IllegalStateException("Existing orgNode $existingNode has version ${existingNode.version}. Passed in version was ${orgNode.version}.")
+        }
+
+        val action = existingNode?.let { UPDATE } ?: CREATE
+
         val events = mutableListOf<OrgNodeChangeEvent>()
-        events.add(OrgNodeChangeEvent(UUID.randomUUID(), Action.CREATE, orgNode))
+        events.add(OrgNodeChangeEvent(UUID.randomUUID(), action, orgNode.copy(version = orgNode.version + 1)))
 
         if (orgNode.parent != null) {
             val parent = getById(orgNode.parent)
                     ?: throw IllegalArgumentException("Parent with id ${orgNode.parent} does not exist.")
 
             // add org node to children
-            val updatedParent = OrgNode(parent.id, parent.name, parent.parent, parent.children.plus(orgNode.id))
+            val updatedParent = parent.copy(children = parent.children.plus(orgNode.id), version = parent.version + 1)
             events.add(OrgNodeChangeEvent(UUID.randomUUID(), UPDATE, updatedParent))
         }
         events.forEach {kafkaTemplate.send(OrgNodeChangeEvent.TOPIC_NAME, it.orgNode.id, it)}

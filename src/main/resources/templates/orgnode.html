@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Taurus Staff Utils</title>
+</head>
+<body>
+<div layout:fragment="content" th:remove="tag">
+    <h1>organisational hierarchy</h1>
+    <p>This is a fake staff app to manage organisational hierarchy.</p>
+
+    <div class="alert alert-success alert-dismissible fade show" role="alert" th:if="${created != null}">
+        OrgNode with name <span th:text="${created}"></span> created successfully.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" th:each="err : ${#fields.errors('*')}" th:inline="text">
+        [[${err}]]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <form th:action="@{/orgnode}" method="post" th:object="${orgNode}">
+        <div class="form-group">
+            <label for="createOrEdit">Select organisational entity to edit</label>
+            <select class="selectpicker form-control" data-live-search="true" th:field="*{id}" id="createOrEdit"
+                    aria-describedby="createOrEditHelp" onchange="updateForm(this.value)">
+                <option value="">create new</option>
+                <option th:each="node: ${orgNodes}" th:value="${node.id}" th:text="${node.name}"></option>
+            </select>
+            <small id="createOrEditHelp" class="form-text text-muted">Choose if you want to edit an organsational entity or create a new one.</small>
+        </div>
+        <div class="form-group">
+            <label for="name">name</label>
+            <input type="text" class="form-control" id="name" aria-describedby="orgNodeHelp" th:field="*{name}">
+            <small id="orgNodeHelp" class="form-text text-muted">The name of the organisational node you want to create.</small>
+        </div>
+        <div class="form-group">
+            <label for="parent">reports to</label>
+            <select class="selectpicker form-control" data-live-search="true" th:field="*{parent}" id="parent" aria-describedby="parentHelp">
+                <option value="">none</option>
+                <option th:each="node: ${orgNodes}" th:value="${node.id}" th:text="${node.name}"></option>
+            </select>
+            <small id="parentHelp" class="form-text text-muted">The new organisational entity is reporting to this unit.</small>
+        </div>
+
+        <!-- manager -->
+        <div class="form-group">
+            <label for="manager">manager</label>
+            <select class="selectpicker form-control" data-live-search="true" th:field="*{manager}" id="manager" aria-describedby="managerHelp">
+                <option value="">none</option>
+                <option th:each="identity: ${identities}" th:value="${identity.id}" th:text="${identity.name}"></option>
+            </select>
+            <small id="managerHelp" class="form-text text-muted">The manager of the selected entitiy.</small>
+        </div>
+
+        <!-- employees -->
+        <div class="form-group">
+            <label for="members">team members</label>
+            <select multiple class="selectpicker form-control" data-live-search="true" th:field="*{members}" id="members" aria-describedby="memberHelp">
+                <option th:each="identity: ${identities}" th:value="${identity.id}" th:text="${identity.name}"></option>
+            </select>
+            <small id="memberHelp" class="form-text text-muted">The employees working for this entity.</small>
+        </div>
+
+        <div class="form-group" style="display: none">
+            <label for="children">subordinate orgnodes</label>
+            <select multiple class="selectpicker form-control" data-live-search="true" th:field="*{children}" id="children" aria-describedby="childrenHelp">
+                <option th:each="identity: ${identities}" th:value="${identity.id}" th:text="${identity.name}"></option>
+            </select>
+            <small id="childrenHelp" class="form-text text-muted">The child entities of this entity</small>
+        </div>
+        <div class="form-group" style="display: none">
+            <label for="version">version</label>
+            <input type="text" class="form-control" id="version" aria-describedby="versionHelp" th:field="*{version}">
+            <small id="versionHelp" class="form-text text-muted">The version of the orgNode.</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="submit">Create</button>
+    </form>
+
+    <script>
+        updateForm = function(id) {
+            if (id == null) {
+                $('#submit').button("Create");
+                return
+            }
+
+            // ajax load the orgnode entity
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                headers: {
+                    "Content-Type": "application/json; charset=utf-8"
+                },
+                url: "/orgnode/" + id,
+                success: function(data){
+                    console.log(data);
+                    $('#name').val(data.name);
+
+                    let parent = $('#parent');
+                    parent.val(data.parent);
+                    parent.selectpicker('refresh');
+
+                    let manager = $('#manager');
+                    manager.val(data.manager);
+                    manager.selectpicker('refresh');
+
+                    let members = $('#members');
+                    members.val(data.children);
+                    members.selectpicker('refresh');
+
+                    let children = $('#children');
+                    children.val(data.children);
+                    children.selectpicker('refresh');
+
+                    $('#version').val(data.version);
+
+                    $('#submit').button("Update");
+                }
+            });
+
+        }
+    </script>
+
+</div>
+</body>
+</html>
