@@ -1,6 +1,7 @@
 package org.linesofcode.taurus.redis_import
 
 import org.linesofcode.taurus.domain.Identity
+import org.linesofcode.taurus.domain.IdentityRole
 import org.linesofcode.taurus.domain.OrgNode
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -18,35 +19,42 @@ class RedisConfig {
         const val ORG_NODE_KEY = "OrgNode"
         const val ORG_NODE_ROOT_KEY = "OrgNodeRoot"
         const val IDENTITY_KEY = "Identity"
+        const val IDENTITY_ROLE_KEY = "IdentityRole"
     }
 
     @Bean
-    fun orgNodeRedisTemplate(factory: RedisConnectionFactory): RedisTemplate<String, OrgNode> {
-        val template = RedisTemplate<String, OrgNode>()
-        template.setConnectionFactory(factory)
-        template.keySerializer = StringRedisSerializer()
-        template.valueSerializer = Jackson2JsonRedisSerializer<OrgNode>(OrgNode::class.java)
-        template.setDefaultSerializer(template.valueSerializer)
-        return template
+    fun orgNodeOperations(factory: RedisConnectionFactory): HashOperations<String, UUID, OrgNode> {
+        return buildHashOps(factory)
     }
 
     @Bean
-    fun orgNodeOperations(redisTemplate: RedisTemplate<String, OrgNode>): HashOperations<String, UUID, OrgNode> {
-        return redisTemplate.opsForHash<UUID, OrgNode>()
+    fun identityOperations(factory: RedisConnectionFactory): HashOperations<String, UUID, Identity> {
+        return buildHashOps(factory)
     }
 
     @Bean
-    fun identityRedisTemplate(factory: RedisConnectionFactory): RedisTemplate<String, Identity> {
-        val template = RedisTemplate<String, Identity>()
+    fun identityRoleOperations(factory: RedisConnectionFactory): HashOperations<String, UUID, IdentityRole> {
+        return buildHashOps(factory)
+    }
+
+    @Bean
+    fun redisTemplate(factory: RedisConnectionFactory): RedisTemplate<String, Any> {
+        val template = RedisTemplate<String, Any>()
         template.setConnectionFactory(factory)
         template.keySerializer = StringRedisSerializer()
         template.valueSerializer = Jackson2JsonRedisSerializer<Identity>(Identity::class.java)
         template.setDefaultSerializer(template.valueSerializer)
+        template.afterPropertiesSet()
         return template
     }
 
-    @Bean
-    fun identityOperations(redisTemplate: RedisTemplate<String, Identity>): HashOperations<String, UUID, Identity> {
-        return redisTemplate.opsForHash<UUID, Identity>()
+    private inline fun <reified T> buildHashOps(factory: RedisConnectionFactory): HashOperations<String, UUID, T> {
+        val template = RedisTemplate<String, T>()
+        template.setConnectionFactory(factory)
+        template.keySerializer = StringRedisSerializer()
+        template.valueSerializer = Jackson2JsonRedisSerializer<T>(T::class.java)
+        template.setDefaultSerializer(template.valueSerializer)
+        template.afterPropertiesSet()
+        return template.opsForHash<UUID, T>()
     }
 }

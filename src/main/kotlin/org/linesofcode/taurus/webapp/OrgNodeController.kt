@@ -26,8 +26,6 @@ class OrgNodeController {
     @Autowired
     private lateinit var identityService: IdentityService
 
-    //TODO: allow editing of orgnodes
-
     @RequestMapping("/orgnode", method = [GET])
     fun orgnodeGet(model: ModelMap): String {
         fillModel(model)

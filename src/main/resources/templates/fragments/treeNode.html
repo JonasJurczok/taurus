@@ -11,7 +11,9 @@
         <span th:inline="text" onclick="loadDetails(this)">
                         <i class="far fa-building ic-w mr-1"></i>
                         [[${node.name}]]
+
                     </span>
+        <i class="fas fa-plus ic-w mr-1" data-toggle="modal" data-target="#createIdentityRoleModal" onclick="setModalOrgNodeID(this.parentElement.id)"></i>
         <ul class="nested">
             <li th:if="${node.manager != null}" th:inline="text">
                 <i class="far fa-user ic-w mr-1"></i>

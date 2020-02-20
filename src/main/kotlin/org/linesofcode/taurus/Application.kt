@@ -2,6 +2,7 @@ package org.linesofcode.taurus
 
 import org.apache.kafka.clients.admin.NewTopic
 import org.linesofcode.taurus.domain.IdentityChangeEvent
+import org.linesofcode.taurus.domain.IdentityRoleChangeEvent
 import org.linesofcode.taurus.domain.OrgNodeChangeEvent
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
@@ -25,6 +26,11 @@ class DefaultConfiguration() {
 	@Bean
 	fun identityChangeTopic(): NewTopic {
 		return NewTopic(IdentityChangeEvent.TOPIC_NAME, 1, 1)
+	}
+
+	@Bean
+	fun identityRoleChangeTopic(): NewTopic {
+		return NewTopic(IdentityRoleChangeEvent.TOPIC_NAME, 1, 1)
 	}
 
 }

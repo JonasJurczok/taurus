@@ -24,6 +24,7 @@
                         <div class="dropdown-menu" aria-labelledby="staffDropdown">
                             <a class="dropdown-item" th:classappend="${#strings.equals(view, '/orgnode') ? 'active' : ''}" href="/orgnode">organisational hierarchy</a>
                             <a class="dropdown-item" th:classappend="${#strings.equals(view, '/staff') ? 'active' : ''}" href="/identity">identities</a>
+                            <a class="dropdown-item" href="/reload">reload redis cache</a>
                         </div>
                     </li>
                 </ul>

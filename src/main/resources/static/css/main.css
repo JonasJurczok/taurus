@@ -27,3 +27,7 @@ footer p {
 .opened span {
     color: #f8f9fa;
 }
+
+.fa-plus {
+    margin-left: 10px;
+}
