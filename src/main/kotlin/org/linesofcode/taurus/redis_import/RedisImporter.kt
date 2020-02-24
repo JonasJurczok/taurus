@@ -33,7 +33,7 @@ class RedisImporter: AbstractConsumerSeekAware() {
     private lateinit var identityOperations: HashOperations<String, UUID, Identity>
 
     @Autowired
-    private lateinit var identityRoleOperations: HashOperations<String, UUID, IdentityRole>
+    private lateinit var identityRoleOperations: HashOperations<String, UUID, MutableMap<UUID, IdentityRole>>
 
     @KafkaListener(topics = [OrgNodeChangeEvent.TOPIC_NAME], groupId = "taurus-redis-importer-orgnode", id = "redis-staff-org-node-change")
     fun importOrgEvents(event: OrgNodeChangeEvent) {
@@ -59,9 +59,12 @@ class RedisImporter: AbstractConsumerSeekAware() {
 
     @KafkaListener(topics = [IdentityRoleChangeEvent.TOPIC_NAME], groupId = "taurus-redis-importer-identity-role", id = "redis-identity-governance-identity-role-change")
     fun importIdentityRoleEvents(event: IdentityRoleChangeEvent) {
-        logger.info("Importing identity event [{}].", event)
-        identityRoleOperations.put(IDENTITY_ROLE_KEY, event.identityRole.id, event.identityRole)
+        logger.info("Importing identity role event [{}].", event)
+        val identityRole = event.identityRole
 
+        val roles = identityRoleOperations.get(IDENTITY_ROLE_KEY, identityRole.orgNode) ?: mutableMapOf()
+        roles[identityRole.id] = identityRole
+        identityRoleOperations.put(IDENTITY_ROLE_KEY, identityRole.orgNode, roles)
     }
 
     fun reload() {
@@ -69,7 +72,7 @@ class RedisImporter: AbstractConsumerSeekAware() {
 
         redisTemplate.execute<Any> { con -> con.flushAll() }
 
-        listOf(IdentityChangeEvent.TOPIC_NAME, OrgNodeChangeEvent.TOPIC_NAME)
+        listOf(IdentityChangeEvent.TOPIC_NAME, OrgNodeChangeEvent.TOPIC_NAME, IdentityRoleChangeEvent.TOPIC_NAME)
                 .mapNotNull { topicName -> seekCallbacks.keys.find { it.topic() == topicName } }
                 .map { getSeekCallbackFor(it)?.seekToBeginning(it.topic(), it.partition()) }
     }

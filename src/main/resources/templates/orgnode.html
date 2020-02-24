@@ -70,7 +70,7 @@
         <div class="form-group" style="display: none">
             <label for="children">subordinate orgnodes</label>
             <select multiple class="selectpicker form-control" data-live-search="true" th:field="*{children}" id="children" aria-describedby="childrenHelp">
-                <option th:each="identity: ${identities}" th:value="${identity.id}" th:text="${identity.name}"></option>
+                <option th:each="node: ${orgNodes}" th:value="${node.id}" th:text="${node.name}"></option>
             </select>
             <small id="childrenHelp" class="form-text text-muted">The child entities of this entity</small>
         </div>

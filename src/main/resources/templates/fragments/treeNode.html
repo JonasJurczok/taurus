@@ -6,7 +6,6 @@
 <!--/*@thymesVar id="nodes" type="java.util.List<org.linesofcode.taurus.webapp.dto.OrgNodeDTO>"*/-->
 <th:block th:fragment="treeNode" th:each="node: ${nodes}">
     <li th:id="${node.id}">
-        <!--<i onclick="loadChildren(this.id)" th:id="${node.id}" th:unless="${node.children.isEmpty()}" class="fas fa-angle-right rotate"></i>-->
         <i onclick="loadChildren(this.parentElement.id)"  class="fas fa-angle-right rotate"></i>
         <span th:inline="text" onclick="loadDetails(this)">
                         <i class="far fa-building ic-w mr-1"></i>
@@ -21,8 +20,15 @@
             </li>
             <th:block th:each="member: ${node.members}">
                 <li th:inline="text">
-                    <i class="far fa-user-circle ic-w mr-1"></i>
+                    <i class="far fa-user-circle ic-w mr-1" th:if="${member.type.toString() == 'HUMAN'}"></i>
+                    <i class="fas fa-robot ic-w mr-1" th:if="${member.type.toString() == 'MACHINE'}"></i>
                     [[${member.name}]]
+                </li>
+            </th:block>
+            <th:block th:each="role: ${node.roles}">
+                <li th:inline="text">
+                    <i class="fas fa-cog ic-w mr-1"></i>
+                    [[${role.name}]]
                 </li>
             </th:block>
         </ul>

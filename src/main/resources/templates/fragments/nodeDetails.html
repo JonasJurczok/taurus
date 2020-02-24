@@ -9,14 +9,10 @@
     <div th:inline="text">name: [[${node.name}]]</div>
     <div th:inline="text">manager: [[${node.manager.name}]]</div>
 
-    <form th:action="@{/identityRole}" method="post" th:object="${role}">
-        <div class="form-group">
-            <label for="name">name</label>
-            <input type="text" class="form-control" id="name" aria-describedby="orgNodeHelp" th:field="*{name}">
-            <small id="orgNodeHelp" class="form-text text-muted">The name of role.</small>
-        </div>
-
-    </form>
+    <div>Roles</div>
+    <ul>
+        <li th:each="role: ${node.roles}" th:text="${role.name}"></li>
+    </ul>
 
 </th:block>
 </body>

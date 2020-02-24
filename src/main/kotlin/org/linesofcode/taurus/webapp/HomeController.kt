@@ -2,6 +2,7 @@ package org.linesofcode.taurus.webapp
 
 import org.linesofcode.taurus.domain.OrgNode
 import org.linesofcode.taurus.redis_import.RedisImporter
+import org.linesofcode.taurus.webapp.dto.OrgNodeToOrgNodeDTOTransformer
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
@@ -19,13 +20,19 @@ class HomeController {
     private lateinit var identityService: IdentityService
 
     @Autowired
+    private lateinit var roleService: RoleService
+
+    @Autowired
     private lateinit var redisImporter: RedisImporter
+
+    @Autowired
+    private lateinit var orgNodeToOrgNodeDTOTransformer: OrgNodeToOrgNodeDTOTransformer
 
     @RequestMapping("/", method = [GET])
     fun home(model: ModelMap): String {
         model.addAttribute("rootNodes", orgNodeService.getRootNodes().map {
-            node: OrgNode ->
-            node.toDTO(node.manager?.let { identityService.getById(it) }, identityService.getByIds(node.members))})
+            node: OrgNode -> orgNodeToOrgNodeDTOTransformer.toDTO(node)
+        })
         return "index"
     }
 

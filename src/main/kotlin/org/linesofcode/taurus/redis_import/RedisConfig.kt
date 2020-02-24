@@ -33,7 +33,7 @@ class RedisConfig {
     }
 
     @Bean
-    fun identityRoleOperations(factory: RedisConnectionFactory): HashOperations<String, UUID, IdentityRole> {
+    fun identityRoleOperations(factory: RedisConnectionFactory): HashOperations<String, UUID, MutableMap<UUID, IdentityRole>> {
         return buildHashOps(factory)
     }
 
@@ -42,7 +42,7 @@ class RedisConfig {
         val template = RedisTemplate<String, Any>()
         template.setConnectionFactory(factory)
         template.keySerializer = StringRedisSerializer()
-        template.valueSerializer = Jackson2JsonRedisSerializer<Identity>(Identity::class.java)
+        template.valueSerializer = Jackson2JsonRedisSerializer<Any>(Any::class.java)
         template.setDefaultSerializer(template.valueSerializer)
         template.afterPropertiesSet()
         return template

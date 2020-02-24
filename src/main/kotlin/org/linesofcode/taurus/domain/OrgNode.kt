@@ -12,7 +12,7 @@ data class OrgNode(@JsonProperty("id") val id: UUID = UUID.randomUUID(),
                    @JsonProperty("members") val members: Set<UUID> = emptySet(),
                    @JsonProperty("version") val version: Int = 0) {
 
-    fun toDTO(manager: Identity? = null, members: Set<Identity> = emptySet()): OrgNodeDTO {
-        return OrgNodeDTO(id, name, parent, children, manager, members)
+    fun toDTO(manager: Identity? = null, members: Set<Identity> = emptySet(), roles: Set<IdentityRole> = emptySet()): OrgNodeDTO {
+        return OrgNodeDTO(id, name, parent, children, manager, members, roles = roles)
     }
 }

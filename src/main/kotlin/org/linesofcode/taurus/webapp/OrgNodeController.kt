@@ -1,6 +1,7 @@
 package org.linesofcode.taurus.webapp
 
 import org.linesofcode.taurus.domain.OrgNode
+import org.linesofcode.taurus.webapp.dto.OrgNodeToOrgNodeDTOTransformer
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
@@ -25,6 +26,12 @@ class OrgNodeController {
 
     @Autowired
     private lateinit var identityService: IdentityService
+
+    @Autowired
+    private lateinit var roleService: RoleService
+
+    @Autowired
+    private lateinit var orgNodeToOrgNodeDTOTransformer: OrgNodeToOrgNodeDTOTransformer
 
     @RequestMapping("/orgnode", method = [GET])
     fun orgnodeGet(model: ModelMap): String {
@@ -67,14 +74,9 @@ class OrgNodeController {
 
     @RequestMapping("/orgnode/{id}", method = [GET], produces = ["text/html"])
     fun getDetailsHTMLByID(@PathVariable id: UUID, model: ModelMap): String {
-        val node = orgNodeService.getById(id)
-
         logger.info("Getting nodeDetails as HTML for id [$id]")
 
-        model.addAttribute("node", node?.toDTO(
-                node.manager?.let { identityService.getById(it) },
-                node.members.mapNotNull { identityService.getById(it) }.toSet())
-        )
+        model.addAttribute("node", orgNodeService.getById(id)?.let { orgNodeToOrgNodeDTOTransformer.toDTO(it) })
         return "fragments/nodeDetails :: nodeDetails"
     }
 
@@ -83,8 +85,8 @@ class OrgNodeController {
         logger.info("Searching for children of [{}].", id)
 
         model.addAttribute("nodes", orgNodeService.getChildrenById(id).map {
-            node: OrgNode ->
-            node.toDTO(node.manager?.let { identityService.getById(it) }, identityService.getByIds(node.members))})
+            node: OrgNode -> orgNodeToOrgNodeDTOTransformer.toDTO(node)
+        })
 
         return "fragments/treeNode :: treeNode"
     }
